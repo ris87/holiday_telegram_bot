@@ -37,7 +37,7 @@ class Scrapping:
                     for key in html_class:
                         sth = a.find_all(class_=html_class[key])
 
-                        for deeper in sth:
+                        for deeper in sth:  # TODO - tu mozna dodac metode np. _create_sth()
                             html_line = deeper.text
                             if key == 'price':
                                 price_fit = re.search('\d*\d*\d*\d*\d', html_line)
@@ -51,7 +51,7 @@ class Scrapping:
 
 
     def db_save(self):
-        db = sqlite3.connect('trips.sqlite')
+        db = sqlite3.connect('trips.sqlite')    # TODO - nazwa bazy do konfiga
         # db.execute("CREATE TABLE IF NOT EXISTS trip "
         #            "(id INTEGER PRIMARY KEY, date TEXT, title TEXT, link TEXT, context TEXT, price INTEGER, type TEXT)")
         cursor = db.cursor()
@@ -79,4 +79,4 @@ class Scrapping:
                 if soup_sold or soup_not_actual:
                     cursor.execute(f"DELETE FROM trip where link='{link}'")
                     print('DELETED: ', link)
-        db.commit()
+        db.commit() # TODO - można dać na koniec return jak udało się dodać commit lub nie

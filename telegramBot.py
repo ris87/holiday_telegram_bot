@@ -1,3 +1,4 @@
+import enum
 import time
 from trying import Scrapping, object_type
 import sqlite3
@@ -6,6 +7,18 @@ import re
 
 
 class InstructionList:
+    # TODO - można zrobić jedną instruction z parametrem message i tą wartość wyciągać z np podstępnego słownika lub enumów
+    # np. {
+    # klucz1: tutaj_komunikat,
+    # klucz2: tutaj_komunikat,
+    # klucz3: tutaj_komunikat,
+    # }
+    # lub tworzyć klasę z enumami np:
+    # class Messages(enum.Enum):
+    #     klucz1 = 'tutaj_komunikat'
+    #     klucz2 = 'tutaj_komunikat'
+    #     klucz3 = 'tutaj_komunikat'
+    # i potem uzywasz instruction_1(Messages.klucz1.value)
     def instruction_1(self):
         return """Witaj w wyszukiwarce wycieczek!
                 Co chcesz zrobić?
@@ -67,7 +80,7 @@ class SearchingDb:
         words = str(self.message.text)
 
         price_obj = re.search('[0-9]+', words)
-        if price_obj:
+        if price_obj:   # TODO  self.price = price_obj.group() if price_obj else None
             self.price = price_obj.group()
             print('price', self.price)
 
@@ -76,6 +89,8 @@ class SearchingDb:
             trip_type_pl = trip_type_obj.group().strip(' ')
             self.trip_type = trip_type_dict[trip_type_pl]
             print('type obj', self.trip_type)
+            # TODO - w wersji produkcyjnej (finalnej) usuń printy a jak chcesz by program logował to użyj logger
+            # TODO z określeniem poziomu bledu np. logging.warning('Watch out!')
 
         for word in words.split():
             numbers = re.search('[0-9]+', word)
@@ -107,7 +122,7 @@ class SearchingDb:
 
 instructions = InstructionList()
 
-bot = telebot.TeleBot("5462005082:AAFcYBB9urjaVQcDKm4rLU7aJJ_iLFcvf0U")
+bot = telebot.TeleBot("5462005082:AAFcYBB9urjaVQcDKm4rLU7aJJ_iLFcvf0U") # TODO - haslo do credentials tu zmienna tylko
 
 
 @bot.message_handler(commands=['wyszukaj'])
@@ -133,7 +148,7 @@ def searching_info(message):
 
 
 @bot.message_handler(commands=['wysylaj'])
-def sending_data(message):
+def sending_data(message):  # TODO - do dłuższych metod dopisz docstringi, opisz też jakie wartości może przymować metoda (https://docs.python.org/3/library/typing.html) np. sending_data(message: str) -> None:
     sending = SearchingDb(message)
     filter_par = sending.fit_in_parameters()
     price, trip_type, key_word = filter_par[0], filter_par[1], filter_par[2]
@@ -147,7 +162,7 @@ def sending_data(message):
     if not key_word: key_word = ''
     print(price, trip_type, key_word)
 
-    while True:
+    while True: # TODO : z tego można stworzyć osobną metodę np _sending_data_message_sent(price, trip_type, key_word)
         db_filtered = Scrapping()
         db_filtered.create_list()
         new_db_lines = db_filtered.db_save()
@@ -168,3 +183,4 @@ def first_info(message):
 
 
 bot.infinity_polling()
+# TODO - utwórz klasę odpalającą i ją opisz w docstring
