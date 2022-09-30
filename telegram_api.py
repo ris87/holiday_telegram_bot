@@ -1,29 +1,29 @@
 import requests
 import time
-from trying import Scrapping
+from db_processing import initialisation, db_query_delete
+from config import telegram_auth_token, telegram_group_id
 
-telegram_auth_token = '5448084852:AAHAW__rhPpUHahuEtc1uHet-HrTVijoz3I'  # TODO - przenieść config/autoryzację do innego katalogu configów. (low)
-telegram_group_id = 'holi_chance'
 
-# TODO Zmiana poniższych w klasę z metodami , config moze być np w init
 def send_message_on_telegram(message):
     telegram_api_url = f'https://api.telegram.org/bot{telegram_auth_token}/sendMessage?chat_id=@{telegram_group_id}&text={message}'
-    tel_resp = requests.get(telegram_api_url)   # TODO tu mozna dać jako return
+    tel_resp = requests.get(telegram_api_url)
 
 
-def message_format():
-    if instruction:
+def message_format(new_db_lines):
+    """
+    Takes new data from db if append and send on TelegramBot in fitted format
+    :param new_db_lines: list with new db data
+    :return: message send by TelegramBot with new_db_lines data
+    """
+    if new_db_lines:
         send_message_on_telegram("Zobacz nowe oferty!")
-        for index, x in enumerate(instruction):
-            date, title, link, price = instruction[index][0], instruction[index][1], instruction[index][2], instruction[index][4]
-            send_message_on_telegram(f"{title}\n{link}\ndata dodania: {date}\n cena: {price}")
+        for x in new_db_lines:
+            date_db, title_db, link_db, trip_type_db, price_db,  key_word_db = x[0], x[1], x[2], x[3], x[4], x[5]
+            send_message_on_telegram(f"{title_db}\n{link_db}\ncena: {price_db}")
 
 
 while True:
-    exp = Scrapping()
-    exp.db_query_delete()
-    exp.create_list()
-    instruction = exp.db_save()
-    message_format()
+    # db_query_delete()
+    message_format(initialisation('exp'))
     print('one loop end')
-    time.sleep(30)  # TODO to bedzie mozna przeniesć do configu (samą wartość 30 )
+    time.sleep(3600)
